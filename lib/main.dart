@@ -6,7 +6,7 @@ void main() => runApp(new TodoApp());
 class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(title: 'Todo List', home: new TodoList());
+    return new MaterialApp(title: 'Keepr', home: new TodoList());
   }
 }
 
@@ -53,13 +53,13 @@ class TodoListState extends State<TodoList> {
         context: context,
         builder: (BuildContext context) {
           return new AlertDialog(
-              title: new Text('Mark "${_todoItems[index]}" as done?'),
+              title: new Text('Supprimer "${_todoItems[index]}" de la liste ?'),
               actions: <Widget>[
                 new FlatButton(
-                    child: new Text('CANCEL'),
+                    child: new Text('Annuler'),
                     onPressed: () => Navigator.of(context).pop()),
                 new FlatButton(
-                    child: new Text('MARK AS DONE'),
+                    child: new Text('Supprimer'),
                     onPressed: () {
                       _removeTodoItem(index);
                       Navigator.of(context).pop();
@@ -70,12 +70,12 @@ class TodoListState extends State<TodoList> {
 
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: new Text('Todo List')),
+      appBar: new AppBar(centerTitle: true, title: new Text('Keepr Mobile')),
       body: _buildTodoList(),
       floatingActionButton: new FloatingActionButton(
           onPressed: _pushAddTodoScreen,
           // pressing this button now opens the new screen
-          tooltip: 'Add task',
+          tooltip: 'Ajouter un objet',
           child: new Icon(Icons.add)),
     );
   }
@@ -83,21 +83,21 @@ class TodoListState extends State<TodoList> {
   void _pushAddTodoScreen() {
     // Push this page onto the stack
     Navigator.of(context).push(
-        // MaterialPageRoute will automatically animate the screen entry, as well
-        // as adding a back button to close it
+      // MaterialPageRoute will automatically animate the screen entry, as well
+      // as adding a back button to close it
         new MaterialPageRoute(builder: (context) {
-      return new Scaffold(
-          appBar: new AppBar(title: new Text('Add a new task')),
-          body: new TextField(
-            autofocus: true,
-            onSubmitted: (val) {
-              _addTodoItem(val);
-              Navigator.pop(context); // Close the add todo screen
-            },
-            decoration: new InputDecoration(
-                hintText: 'Enter something to do...',
-                contentPadding: const EdgeInsets.all(16.0)),
-          ));
-    }));
+          return new Scaffold(
+              appBar: new AppBar(title: new Text('Ajouter un objet')),
+              body: new TextField(
+                autofocus: true,
+                onSubmitted: (val) {
+                  _addTodoItem(val);
+                  Navigator.pop(context); // Close the add todo screen
+                },
+                decoration: new InputDecoration(
+                    hintText: 'Enter le nom de l\'objet',
+                    contentPadding: const EdgeInsets.all(16.0)),
+              ));
+        }));
   }
 }
