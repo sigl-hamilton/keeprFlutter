@@ -29,8 +29,12 @@ class TodoListState extends State<TodoList> {
   }
 
   Widget _buildTodoItem(String todoText, int index) {
-    return new ListTile(
-        title: new Text(todoText), onTap: () => _promptRemoveTodoItem(index));
+    return new Card(
+        child: ListTile(
+            leading: FlutterLogo(),
+            trailing: Icon(Icons.more_vert),
+            onTap: () => _promptRemoveTodoItem(index),
+            title: new Text(todoText)));
   }
 
 // Instead of autogenerating a todo item, _addTodoItem now accepts a string
@@ -83,21 +87,21 @@ class TodoListState extends State<TodoList> {
   void _pushAddTodoScreen() {
     // Push this page onto the stack
     Navigator.of(context).push(
-      // MaterialPageRoute will automatically animate the screen entry, as well
-      // as adding a back button to close it
+        // MaterialPageRoute will automatically animate the screen entry, as well
+        // as adding a back button to close it
         new MaterialPageRoute(builder: (context) {
-          return new Scaffold(
-              appBar: new AppBar(title: new Text('Ajouter un objet')),
-              body: new TextField(
-                autofocus: true,
-                onSubmitted: (val) {
-                  _addTodoItem(val);
-                  Navigator.pop(context); // Close the add todo screen
-                },
-                decoration: new InputDecoration(
-                    hintText: 'Enter le nom de l\'objet',
-                    contentPadding: const EdgeInsets.all(16.0)),
-              ));
-        }));
+      return new Scaffold(
+          appBar: new AppBar(title: new Text('Ajouter un objet')),
+          body: new TextField(
+            autofocus: true,
+            onSubmitted: (val) {
+              _addTodoItem(val);
+              Navigator.pop(context); // Close the add todo screen
+            },
+            decoration: new InputDecoration(
+                hintText: 'Enter le nom de l\'objet',
+                contentPadding: const EdgeInsets.all(16.0)),
+          ));
+    }));
   }
 }
