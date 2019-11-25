@@ -161,7 +161,8 @@ class ItemListState extends State<ItemList> {
                       heroTag: 'fab2',
                       onPressed: _pushAddTodoScreen,
                       tooltip: 'Ajouter un objet',
-                      child: Icon(Icons.add)),
+                      child: Icon(Icons.add),
+                      backgroundColor: Color(0xff09203f)),
                 ])),
         floatingActionButtonLocation:
             FloatingActionButtonLocation.centerDocked);
