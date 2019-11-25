@@ -8,7 +8,8 @@ build/
 .android/
 .ios/
 .idea/
-ios/.generated/
+ios/
+android/
 packages
 pubspec.lock
 .flutter-plugins
