@@ -24,6 +24,7 @@ class TodoListState extends State<TodoList> {
         if (index < _todoItems.length) {
           return _buildTodoItem(_todoItems[index], index);
         }
+        //    return SizedBox.shrink();
       },
     );
   }
@@ -34,7 +35,11 @@ class TodoListState extends State<TodoList> {
             leading: FlutterLogo(),
             trailing: Icon(Icons.more_vert),
             onTap: () => _promptRemoveTodoItem(index),
-            title: new Text(todoText)));
+            title: new Text(todoText)
+
+        ),
+        elevation: 4.0
+    );
   }
 
 // Instead of autogenerating a todo item, _addTodoItem now accepts a string
@@ -49,6 +54,10 @@ class TodoListState extends State<TodoList> {
 // notifies the app that the state has changed by using setState
   void _removeTodoItem(int index) {
     setState(() => _todoItems.removeAt(index));
+  }
+
+  void _clearTodoItem() {
+    setState(() => _todoItems.clear());
   }
 
 // Show an alert dialog asking the user to confirm that the task is done
@@ -72,18 +81,6 @@ class TodoListState extends State<TodoList> {
         });
   }
 
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(centerTitle: true, title: new Text('Keepr Mobile')),
-      body: _buildTodoList(),
-      floatingActionButton: new FloatingActionButton(
-          onPressed: _pushAddTodoScreen,
-          // pressing this button now opens the new screen
-          tooltip: 'Ajouter un objet',
-          child: new Icon(Icons.add)),
-    );
-  }
-
   void _pushAddTodoScreen() {
     // Push this page onto the stack
     Navigator.of(context).push(
@@ -103,5 +100,42 @@ class TodoListState extends State<TodoList> {
                 contentPadding: const EdgeInsets.all(16.0)),
           ));
     }));
+  }
+
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        centerTitle: true,
+        elevation: 10.0,
+        title: new Text('Keepr Mobile'),
+        actions: <Widget>[
+          IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: () {
+              _clearTodoItem();
+            },
+          )
+        ],
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[
+                Color(0xff280038),
+                Color(0xff09203f)
+              ], // Couleur de la nav bar
+            ),
+          ),
+        ),
+      ),
+      body: _buildTodoList(),
+      backgroundColor: Color(0xffbdbdbd),
+      floatingActionButton: new FloatingActionButton(
+          onPressed: _pushAddTodoScreen,
+          // pressing this button now opens the new screen
+          tooltip: 'Ajouter un objet',
+          child: new Icon(Icons.add)),
+    );
   }
 }

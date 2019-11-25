@@ -1,4 +1,4 @@
-package hamilton.keepr
+package com.example.keepr_flutter
 
 import android.os.Bundle
 
