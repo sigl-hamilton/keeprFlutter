@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keepr/screens/bluetooth_main.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -146,8 +147,13 @@ class ItemListState extends State<ItemList> {
                 children: <Widget>[
                   FloatingActionButton(
                       heroTag: 'fab1',
-                      onPressed: () {},
-                      tooltip: 'Ajouter un objet',
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ArduinoBT()));
+                      },
+                      tooltip: 'Bluetooth',
                       child: Icon(Icons.bluetooth_connected),
                       backgroundColor: Colors.deepPurple),
                   RaisedButton(
