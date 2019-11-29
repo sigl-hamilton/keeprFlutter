@@ -8,6 +8,7 @@ build/
 .android/
 .ios/
 .idea/
+.vscode/
 
 
 packages
