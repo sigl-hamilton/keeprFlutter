@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:keepr/screens/bluetooth_main.dart';
+import 'package:keepr/screens/nav_bar_color.dart';
 
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(title: 'Keepr', home: new ItemList());
+    return MaterialApp(title: 'Keepr', home: ItemList());
   }
 }
 
 class ItemList extends StatefulWidget {
   @override
-  createState() => new ItemListState();
+  createState() => ItemListState();
 }
 
 class ItemListState extends State<ItemList> {
@@ -28,12 +29,12 @@ class ItemListState extends State<ItemList> {
   }
 
   Widget _buildTodoItem(String todoText, int index) {
-    return new Card(
+    return Card(
         child: ListTile(
             leading: FlutterLogo(),
             trailing: Icon(Icons.more_vert),
             onTap: () => _promptRemoveTodoItem(index),
-            title: new Text(todoText)),
+            title: Text(todoText)),
         elevation: 4.0);
   }
 
@@ -60,14 +61,14 @@ class ItemListState extends State<ItemList> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-              title: new Text('Supprimer "${_todoItems[index]}" de la liste ?'),
+          return AlertDialog(
+              title: Text('Supprimer "${_todoItems[index]}" de la liste ?'),
               actions: <Widget>[
-                new FlatButton(
-                    child: new Text('Annuler'),
+                FlatButton(
+                    child: Text('Annuler'),
                     onPressed: () => Navigator.of(context).pop()),
-                new FlatButton(
-                    child: new Text('Supprimer'),
+                FlatButton(
+                    child: Text('Supprimer'),
                     onPressed: () {
                       _removeTodoItem(index);
                       Navigator.of(context).pop();
@@ -81,30 +82,19 @@ class ItemListState extends State<ItemList> {
     Navigator.of(context).push(
         // MaterialPageRoute will automatically animate the screen entry, as well
         // as adding a back button to close it
-        new MaterialPageRoute(builder: (context) {
-      return new Scaffold(
-          appBar: new AppBar(
-            title: new Text('Ajouter un objet'),
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: <Color>[
-                    Color(0xff280038),
-                    Color(0xff09203f)
-                  ], // Couleur de la nav bar
-                ),
-              ),
-            ),
+        MaterialPageRoute(builder: (context) {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text('Ajouter un objet'),
+            flexibleSpace: NavBarColor()
           ),
-          body: new TextField(
+          body: TextField(
             autofocus: true,
             onSubmitted: (val) {
               _addTodoItem(val);
               Navigator.pop(context); // Close the add todo screen
             },
-            decoration: new InputDecoration(
+            decoration: InputDecoration(
                 hintText: 'Enter le nom de l\'objet',
                 contentPadding: const EdgeInsets.all(16.0)),
           ));
@@ -112,31 +102,20 @@ class ItemListState extends State<ItemList> {
   }
 
   Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: new AppBar(
+    return Scaffold(
+        appBar: AppBar(
           centerTitle: true,
           elevation: 10.0,
-          title: new Text('Keepr Mobile'),
+          title: Text('Keepr Mobile'),
           actions: <Widget>[
             IconButton(
-              icon: new Icon(Icons.delete),
+              icon: Icon(Icons.delete),
               onPressed: () {
                 _clearTodoItem();
               },
             )
           ],
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[
-                  Color(0xff280038),
-                  Color(0xff09203f)
-                ], // Couleur de la nav bar
-              ),
-            ),
-          ),
+          flexibleSpace: NavBarColor()
         ),
         body: _buildItemList(),
         backgroundColor: Color(0xffbdbdbd),

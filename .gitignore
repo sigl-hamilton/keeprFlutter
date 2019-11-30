@@ -6,6 +6,8 @@
 .pub/
 build/
 .android/
+android/.gradle
+android/local.properties
 .ios/
 .idea/
 .vscode/

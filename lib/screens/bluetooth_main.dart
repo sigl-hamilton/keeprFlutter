@@ -1,30 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:keepr/screens/nav_bar_color.dart';
 import 'dart:async';
 import 'bt_controller.dart';
 
 //void main() => runApp(ArduinoBT());
 
-class ArduinoBT extends StatelessWidget {
+class ArduinoBT extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Arduino BT Demo',
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: MainPage(title: 'Arduino BT Demo'),
-    );
-  }
+  createState() => ArduinoBTState();
 }
 
-class MainPage extends StatefulWidget {
-  MainPage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MainPageState createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
+class ArduinoBTState extends State<ArduinoBT> {
   String sensorValue = "N/A";
   bool ledState = false;
 
@@ -45,13 +31,13 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       ledState = !ledState;
     });
-   // BTController.transmit(ledState ? '0' : '1');
+    // BTController.transmit(ledState ? '0' : '1');
   }
 
   Future<void> scanDevices() async {
-   // BTController.enumerateDevices().then((devices) {
-  //    onGetDevices(devices);
-  //  });
+    // BTController.enumerateDevices().then((devices) {
+    //    onGetDevices(devices);
+    //  });
   }
 
   void onGetDevices(List<dynamic> devices) {
@@ -79,7 +65,7 @@ class _MainPageState extends State<MainPage> {
 
   selectDevice(String deviceAddress) {
     Navigator.of(context, rootNavigator: true).pop('dialog');
-   // BTController.connect(deviceAddress);
+    // BTController.connect(deviceAddress);
   }
 
   @override
@@ -88,7 +74,10 @@ class _MainPageState extends State<MainPage> {
     TextTheme theme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+          automaticallyImplyLeading: true,
+          title: Text("Bluetooth"),
+          flexibleSpace: NavBarColor()),
       body: Container(
         decoration: BoxDecoration(color: Colors.black),
         child: Center(
