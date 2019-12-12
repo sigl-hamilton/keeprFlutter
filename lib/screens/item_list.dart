@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keepr/screens/bluetooth_main.dart';
+import 'package:keepr/screens/flutter_blue_app.dart';
 import 'package:keepr/screens/nav_bar_color.dart';
 
 class Home extends StatelessWidget {
@@ -130,7 +130,7 @@ class ItemListState extends State<ItemList> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ArduinoBT()));
+                                builder: (context) => FlutterBlueApp()));
                       },
                       tooltip: 'Bluetooth',
                       child: Icon(Icons.bluetooth_connected),
