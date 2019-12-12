@@ -34,7 +34,8 @@ class BluetoothOffScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue,
+     // backgroundColor: Colors.lightBlue,
+      backgroundColor: Color(0xff280038),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -45,7 +46,7 @@ class BluetoothOffScreen extends StatelessWidget {
               color: Colors.white54,
             ),
             Text(
-              'Bluetooth Adapter is ${state.toString().substring(15)}.',
+              'Your Bluetooth Adapter is ${state.toString().substring(15)}.\nPlease open your bluetooth on the phone !',
               style: Theme.of(context)
                   .primaryTextTheme
                   .subhead
