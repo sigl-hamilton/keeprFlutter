@@ -69,7 +69,7 @@ class FindDevicesScreen extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            FlutterBlue.instance.startScan(timeout: Duration(seconds: 4)),
+            FlutterBlue.instance.startScan(timeout: Duration(seconds: 3)),
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
@@ -147,7 +147,7 @@ class FindDevicesScreen extends StatelessWidget {
   }
 }
 
-class DeviceScreen extends StatelessWidget {
+class  DeviceScreen extends StatelessWidget {
   const DeviceScreen({Key key, this.device}) : super(key: key);
 
   final BluetoothDevice device;

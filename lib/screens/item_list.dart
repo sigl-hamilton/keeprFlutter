@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keepr/screens/flutter_blue_app.dart';
+import 'package:keepr/screens/my_bluetooth.dart';
 import 'package:keepr/screens/nav_bar_color.dart';
 
 class Home extends StatelessWidget {
@@ -18,24 +19,20 @@ class ItemListState extends State<ItemList> {
   List<String> _todoItems = [];
 
   Widget _buildItemList() {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        if (index < _todoItems.length) {
-          return _buildTodoItem(_todoItems[index], index);
-        }
-        //    return SizedBox.shrink();
-      },
-    );
-  }
-
-  Widget _buildTodoItem(String todoText, int index) {
-    return Card(
-        child: ListTile(
-            leading: FlutterLogo(),
-            trailing: Icon(Icons.more_vert),
-            onTap: () => _promptRemoveTodoItem(index),
-            title: Text(todoText)),
-        elevation: 4.0);
+    return _todoItems.isEmpty
+        ? Center(child: Text('Ajoutez des objets pour les surveiller !'))
+        : ListView.builder(
+            itemCount: _todoItems.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                  child: ListTile(
+                      leading: FlutterLogo(),
+                      trailing: Icon(Icons.more_vert),
+                      onTap: () => _promptRemoveTodoItem(index),
+                      title: Text(_todoItems[index])),
+                  elevation: 4.0);
+            },
+          );
   }
 
 // Instead of autogenerating a todo item, _addTodoItem now accepts a string
@@ -85,9 +82,7 @@ class ItemListState extends State<ItemList> {
         MaterialPageRoute(builder: (context) {
       return Scaffold(
           appBar: AppBar(
-            title: Text('Ajouter un objet'),
-            flexibleSpace: NavBarColor()
-          ),
+              title: Text('Ajouter un objet'), flexibleSpace: NavBarColor()),
           body: TextField(
             autofocus: true,
             onSubmitted: (val) {
@@ -104,19 +99,18 @@ class ItemListState extends State<ItemList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          centerTitle: true,
-          elevation: 10.0,
-          title: Text('Keepr Mobile'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                _clearTodoItem();
-              },
-            )
-          ],
-          flexibleSpace: NavBarColor()
-        ),
+            centerTitle: true,
+            elevation: 10.0,
+            title: Text('Keepr Mobile'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  _clearTodoItem();
+                },
+              )
+            ],
+            flexibleSpace: NavBarColor()),
         body: _buildItemList(),
         backgroundColor: Color(0xffbdbdbd),
         floatingActionButton: Padding(
@@ -136,7 +130,12 @@ class ItemListState extends State<ItemList> {
                       child: Icon(Icons.bluetooth_connected),
                       backgroundColor: Colors.deepPurple),
                   RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MyBluetoothApp()));
+                    },
                     elevation: 5,
                     color: Colors.deepPurpleAccent,
                     textColor: Colors.white,
