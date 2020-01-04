@@ -1,7 +1,7 @@
 package io.flutter.plugins;
 
 import io.flutter.plugin.common.PluginRegistry;
-import com.pauldemarco.flutterblue.FlutterBluePlugin;
+import com.pauldemarco.flutter_blue.FlutterBluePlugin;
 
 /**
  * Generated file. Do not edit.
@@ -11,7 +11,7 @@ public final class GeneratedPluginRegistrant {
     if (alreadyRegisteredWith(registry)) {
       return;
     }
-    FlutterBluePlugin.registerWith(registry.registrarFor("com.pauldemarco.flutterblue.FlutterBluePlugin"));
+    FlutterBluePlugin.registerWith(registry.registrarFor("com.pauldemarco.flutter_blue.FlutterBluePlugin"));
   }
 
   private static boolean alreadyRegisteredWith(PluginRegistry registry) {

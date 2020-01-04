@@ -1,29 +1,35 @@
-// Copyright 2017, Paul DeMarco.
+/* // Copyright 2017, Paul DeMarco.
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_esp32_dust_sensor/sensor_page.dart';
+import 'package:flutter_app_esp32_dust_sensor/widgets.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:keepr/screens/dust_sensor.dart';
-import 'package:keepr/screens/nav_bar_color.dart';
-import 'widgets.dart';
+
+void main() {
+  runApp(FlutterBlueApp());
+}
 
 class FlutterBlueApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<BluetoothState>(
-        stream: FlutterBlue.instance.state,
-        initialData: BluetoothState.unknown,
-        builder: (c, snapshot) {
-          final state = snapshot.data;
-          if (state == BluetoothState.on) {
-            return FindDevicesScreen();
-          }
-          return BluetoothOffScreen(state: state);
-        });
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      color: Colors.lightBlue,
+      home: StreamBuilder<BluetoothState>(
+          stream: FlutterBlue.instance.state,
+          initialData: BluetoothState.unknown,
+          builder: (c, snapshot) {
+            final state = snapshot.data;
+            if (state == BluetoothState.on) {
+              return FindDevicesScreen();
+            }
+            return BluetoothOffScreen(state: state);
+          }),
+    );
   }
 }
 
@@ -35,8 +41,7 @@ class BluetoothOffScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.lightBlue,
-      backgroundColor: Color(0xff280038),
+      backgroundColor: Colors.lightBlue,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -47,7 +52,7 @@ class BluetoothOffScreen extends StatelessWidget {
               color: Colors.white54,
             ),
             Text(
-              'Your Bluetooth Adapter is ${state.toString().substring(15)}.\nPlease open your bluetooth on the phone !',
+              'Bluetooth Adapter is ${state.toString().substring(15)}.',
               style: Theme.of(context)
                   .primaryTextTheme
                   .subhead
@@ -66,11 +71,10 @@ class FindDevicesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Find Devices'),
-        flexibleSpace: NavBarColor(),
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            FlutterBlue.instance.startScan(timeout: Duration(seconds: 3)),
+            FlutterBlue.instance.startScan(timeout: Duration(seconds: 4)),
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
@@ -115,7 +119,6 @@ class FindDevicesScreen extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             r.device.connect();
-                            //return DeviceScreen(device: r.device);
                             return SensorPage(device: r.device);
                           })),
                         ),
@@ -154,16 +157,6 @@ class DeviceScreen extends StatelessWidget {
 
   final BluetoothDevice device;
 
-  List<int> _getRandomBytes() {
-    final math = Random();
-    return [
-      math.nextInt(255),
-      math.nextInt(255),
-      math.nextInt(255),
-      math.nextInt(255)
-    ];
-  }
-
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
         .map(
@@ -174,7 +167,7 @@ class DeviceScreen extends StatelessWidget {
                   (c) => CharacteristicTile(
                     characteristic: c,
                     onReadPressed: () => c.read(),
-                    onWritePressed: () => c.write(_getRandomBytes()),
+                    onWritePressed: () => c.write([13, 24]),
                     onNotificationPressed: () =>
                         c.setNotifyValue(!c.isNotifying),
                     descriptorTiles: c.descriptors
@@ -182,7 +175,7 @@ class DeviceScreen extends StatelessWidget {
                           (d) => DescriptorTile(
                             descriptor: d,
                             onReadPressed: () => d.read(),
-                            onWritePressed: () => d.write(_getRandomBytes()),
+                            onWritePressed: () => d.write([11, 12]),
                           ),
                         )
                         .toList(),
@@ -298,3 +291,4 @@ class DeviceScreen extends StatelessWidget {
     );
   }
 }
+ */

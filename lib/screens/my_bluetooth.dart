@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:keepr/screens/nav_bar_color.dart';
-import 'dart:developer';
-
+import 'widgets.dart';
 
 class MyBluetoothApp extends StatelessWidget {
   @override
@@ -78,19 +77,31 @@ class DeviceListState extends State<DeviceList> {
 
   startScanning() {
     flutterBlue.startScan(timeout: Duration(seconds: 4));
+    StreamBuilder<List<ScanResult>>(
+      stream: FlutterBlue.instance.scanResults,
+      initialData: [],
+      builder: (c, snapshot) => Column(
+        children: snapshot.data.map((r) => _addTodoItem(r.toString())),
+      ),
+    );
+
+    /*   _addTodoItem("start scanning");
+    flutterBlue.startScan(timeout: Duration(seconds: 4));
+    //debugPrint(flutterBlue.scanResults.toString());
     flutterBlue.scanResults.listen((scanResultList) {
       scanResultList.map((scanResult) => {
-            _addTodoItem(scanResult.device.name),
+            //   _addTodoItem(scanResult.device.name),
+            setState(() => {_todoItems.add("value")}),
             debugPrint(scanResult.toString()),
             debugPrint("hello")
           });
-    });
-    
+    }); */
+    flutterBlue.stopScan();
   }
 
   Widget _buildDeviceList() {
     return _todoItems.isEmpty
-        ? Center(child: Text('Ajoutez des objets pour les surveiller !'))
+        ? Center(child: Text('Scannez les objets bluetooth !'))
         : ListView.builder(
             itemCount: _todoItems.length,
             itemBuilder: (BuildContext context, int index) {
