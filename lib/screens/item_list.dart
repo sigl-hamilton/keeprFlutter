@@ -134,7 +134,7 @@ class ItemListState extends State<ItemList> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => MyBluetoothApp()));
+                              builder: (context) => DeviceList()));
                     },
                     elevation: 5,
                     color: Colors.deepPurpleAccent,

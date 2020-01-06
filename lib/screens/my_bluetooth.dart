@@ -1,67 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:keepr/screens/nav_bar_color.dart';
-import 'widgets.dart';
-
-class MyBluetoothApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<BluetoothState>(
-        stream: FlutterBlue.instance.state,
-        initialData: BluetoothState.unknown,
-        builder: (c, snapshot) {
-          final state = snapshot.data;
-          if (state == BluetoothState.on) {
-            return DeviceList();
-          }
-          return BluetoothOffScreen(state: state);
-        });
-  }
-}
-
-class BluetoothOffScreen extends StatelessWidget {
-  const BluetoothOffScreen({Key key, this.state}) : super(key: key);
-
-  final BluetoothState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: Colors.lightBlue,
-      backgroundColor: Color(0xff280038),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(
-              Icons.bluetooth_disabled,
-              size: 200.0,
-              color: Colors.white54,
-            ),
-            Text(
-              'Your Bluetooth Adapter is ${state.toString().substring(15)}.\nPlease open your bluetooth on the phone !',
-              style: Theme.of(context)
-                  .primaryTextTheme
-                  .subhead
-                  .copyWith(color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import 'package:keepr/screens/rfid_object.dart';
 
 class DeviceList extends StatefulWidget {
+  const DeviceList({Key key, this.device});
+  final BluetoothDevice device;
+
   @override
   createState() => DeviceListState();
 }
 
 class DeviceListState extends State<DeviceList> {
   List<String> _todoItems = [];
-  FlutterBlue flutterBlue = FlutterBlue.instance;
+  int testing = 0;
 
-  _addTodoItem(String task) {
+
+  addTodoItem(String task) {
     if (task.length > 0) {
       setState(() => _todoItems.add(task));
     }
@@ -76,27 +31,10 @@ class DeviceListState extends State<DeviceList> {
   }
 
   startScanning() {
-    flutterBlue.startScan(timeout: Duration(seconds: 4));
-    StreamBuilder<List<ScanResult>>(
-      stream: FlutterBlue.instance.scanResults,
-      initialData: [],
-      builder: (c, snapshot) => Column(
-        children: snapshot.data.map((r) => _addTodoItem(r.toString())),
-      ),
-    );
-
-    /*   _addTodoItem("start scanning");
-    flutterBlue.startScan(timeout: Duration(seconds: 4));
-    //debugPrint(flutterBlue.scanResults.toString());
-    flutterBlue.scanResults.listen((scanResultList) {
-      scanResultList.map((scanResult) => {
-            //   _addTodoItem(scanResult.device.name),
-            setState(() => {_todoItems.add("value")}),
-            debugPrint(scanResult.toString()),
-            debugPrint("hello")
-          });
-    }); */
-    flutterBlue.stopScan();
+    addTodoItem("Objet " + testing.toString());
+    setState(() {
+      testing = testing + 1;
+    });
   }
 
   Widget _buildDeviceList() {
@@ -116,14 +54,44 @@ class DeviceListState extends State<DeviceList> {
           );
   }
 
+  Future<bool> _onWillPop() {
+    return showDialog(
+        context: context,
+        builder: (context) =>
+            new AlertDialog(
+              title: Text('Are you sure?'),
+              content: Text('Do you want to disconnect device and go back?'),
+              actions: <Widget>[
+                new FlatButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: new Text('No')),
+                new FlatButton(
+                    onPressed: () {
+                      // A essayer de remonter dans le parent
+                      //  disconnectFromDevice();
+                      Navigator.of(context).pop(true);
+                    },
+                    child: new Text('Yes')),
+              ],
+            ) ??
+            false);
+  }
+
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Find Devices'),
-          flexibleSpace: NavBarColor(),
-        ),
-        body: _buildDeviceList(),
-        floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.search), onPressed: () => startScanning()));
+    return WillPopScope(
+        onWillPop: _onWillPop,
+        child: Scaffold(
+            appBar: AppBar(
+              title: Text('Find Devices'),
+              flexibleSpace: NavBarColor(),
+            ),
+            body: Column(children: [
+              Expanded(child: _buildDeviceList()),
+              Expanded(
+                  child: SensorPage(
+                      device: widget.device, addTodoItem: addTodoItem))
+            ]),
+            floatingActionButton: FloatingActionButton(
+                child: Icon(Icons.search), onPressed: () => startScanning())));
   }
 }
