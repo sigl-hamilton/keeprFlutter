@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:keepr/screens/nav_bar_color.dart';
 import 'package:keepr/screens/rfid_object.dart';
+import 'package:flutter/scheduler.dart';
+
 
 class DeviceList extends StatefulWidget {
   const DeviceList({Key key, this.device});
@@ -12,22 +14,23 @@ class DeviceList extends StatefulWidget {
 }
 
 class DeviceListState extends State<DeviceList> {
-  List<String> _todoItems = [];
+  List<String> todoItems = [];
   int testing = 0;
 
 
   addTodoItem(String task) {
     if (task.length > 0) {
-      setState(() => _todoItems.add(task));
+     // SchedulerBinding.instance.addPostFrameCallback((_) => setState(() => todoItems.add(task)));
+    setState(() => todoItems.add(task));
     }
   }
 
   _removeTodoItem(int index) {
-    setState(() => _todoItems.removeAt(index));
+    setState(() => todoItems.removeAt(index));
   }
 
   _clearTodoItem() {
-    setState(() => _todoItems.clear());
+    setState(() => todoItems.clear());
   }
 
   startScanning() {
@@ -38,17 +41,17 @@ class DeviceListState extends State<DeviceList> {
   }
 
   Widget _buildDeviceList() {
-    return _todoItems.isEmpty
+    return todoItems.isEmpty
         ? Center(child: Text('Scannez les objets bluetooth !'))
         : ListView.builder(
-            itemCount: _todoItems.length,
+            itemCount: todoItems.length,
             itemBuilder: (BuildContext context, int index) {
               return Card(
                   child: ListTile(
                       leading: Icon(Icons.bluetooth_searching),
                       trailing: Icon(Icons.more_vert),
                       onTap: () => {},
-                      title: Text(_todoItems[index])),
+                      title: Text(todoItems[index])),
                   elevation: 4.0);
             },
           );
@@ -83,13 +86,19 @@ class DeviceListState extends State<DeviceList> {
         child: Scaffold(
             appBar: AppBar(
               title: Text('Find Devices'),
+              actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  _clearTodoItem();
+                },
+              )
+            ],
               flexibleSpace: NavBarColor(),
             ),
             body: Column(children: [
               Expanded(child: _buildDeviceList()),
-              Expanded(
-                  child: SensorPage(
-                      device: widget.device, addTodoItem: addTodoItem))
+              Expanded(child: SensorPage(device: widget.device, addTodoItem: addTodoItem))
             ]),
             floatingActionButton: FloatingActionButton(
                 child: Icon(Icons.search), onPressed: () => startScanning())));

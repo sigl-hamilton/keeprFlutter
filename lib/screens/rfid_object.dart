@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'dart:developer';
 
+import 'package:flutter/scheduler.dart';
+
 class SensorPage extends StatefulWidget {
   const SensorPage({Key key, this.device, this.addTodoItem}) : super(key: key);
   final BluetoothDevice device;
@@ -19,11 +21,13 @@ class _SensorPageState extends State<SensorPage> {
   bool isReady;
   Stream<List<int>> stream;
   List<double> traceDust = List();
+  Map<String, bool> rfidMap;
 
   @override
   void initState() {
     super.initState();
     isReady = false;
+    rfidMap = Map<String, bool>();
     connectToDevice();
   }
 
@@ -88,6 +92,28 @@ class _SensorPageState extends State<SensorPage> {
     return utf8.decode(dataFromDevice);
   }
 
+  void promptAddItem(String name) async {
+    await Future.delayed(Duration.zero);
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Text('Ajouter "${name}" à la liste des objets surveillés ?'),
+              actions: <Widget>[
+                FlatButton(
+                    child: Text('Annuler'),
+                    onPressed: () => Navigator.of(context).pop()),
+                FlatButton(
+                    child: Text('Ajouter'),
+                    onPressed: () {
+                      widget.addTodoItem(name);
+                      Navigator.of(context).pop();
+                    })
+              ]);
+        });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -110,17 +136,37 @@ class _SensorPageState extends State<SensorPage> {
                     if (snapshot.connectionState == ConnectionState.active) {
                       var currentValue = _dataParser(snapshot.data);
                       traceDust.add(double.tryParse(currentValue) ?? 0);
-                    //  widget.addTodoItem('${currentValue}');
-                      log('read from bluetooth ${currentValue}');
+                      var id = '${currentValue}';
+                      // SchedulerBinding.instance.addPostFrameCallback((_) => widget.addTodoItem('${currentValue}'));
+
+                     /*  Future.delayed(const Duration(milliseconds: 100), () {
+                        widget.addTodoItem('${currentValue}');
+                      }); */
+
+                      
+
+                      if (!rfidMap.containsKey(id)) {
+                        rfidMap[id] = true;
+                        promptAddItem(id);
+                      } else {
+                        rfidMap[id] = !rfidMap[id];
+                      }
+
+                      log('read from bluetooth ' + id);
                       return Center(
                           child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text('Current value from Sensor',
                               style: TextStyle(fontSize: 14)),
-                          Text('RFID UID : ${currentValue}',
+                          rfidMap[id] 
+                          ? Text('RFID UID : ' + id,
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 24))
+                                  color: Colors.green, fontWeight: FontWeight.bold, fontSize: 24)) 
+                          : Text('RFID UID : ' + id,
+                              style: TextStyle(
+                                 color: Colors.red, fontWeight: FontWeight.bold, fontSize: 24)) 
+
                         ],
                       ));
                     } else {

@@ -153,12 +153,46 @@ class DeviceListState extends State<DeviceList> {
           );
   }
 
+  Widget _sensor() {
+    return StreamBuilder<List<int>>(
+                        stream: stream,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<int>> snapshot) {
+                          if (snapshot.hasError)
+                            return Text('Error: ${snapshot.error}');
+                          if (snapshot.connectionState ==
+                              ConnectionState.active) {
+                            var currentValue = _dataParser(snapshot.data);
+                            traceDust.add(double.tryParse(currentValue) ?? 0);
+
+                           Timer _timer = new Timer(const Duration(milliseconds: 600), () {_addTodoItem('${currentValue}');
+                            });
+                    
+                          
+                            return Text('${currentValue}');
+                          } else {
+                            return Text('Check the stream');
+                          }
+                        },
+                      )
+  }
+
+ 
+
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
           appBar: AppBar(
             title: Text('Find Devices'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  _clearTodoItem();
+                },
+              )
+            ],
             flexibleSpace: NavBarColor(),
           ),
           body: Container(
@@ -169,26 +203,10 @@ class DeviceListState extends State<DeviceList> {
                         style: TextStyle(fontSize: 24, color: Colors.red),
                       ),
                     )
-                  : Row(children: <Widget>[
-                      _buildDeviceList(),
-                      StreamBuilder<List<int>>(
-                        stream: stream,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List<int>> snapshot) {
-                          if (snapshot.hasError)
-                            return Text('Error: ${snapshot.error}');
-
-                          if (snapshot.connectionState ==
-                              ConnectionState.active) {
-                            var currentValue = _dataParser(snapshot.data);
-                            traceDust.add(double.tryParse(currentValue) ?? 0);
-                           // _todoItems.add('${currentValue}');
-                            return Text('${currentValue}');
-                          } else {
-                            return Text('Check the stream');
-                          }
-                        },
-                      ),
+                  : Column(children: <Widget>[
+                      Expanded(child: _buildDeviceList()),
+                      Expanded(
+                          child: )
                     ])),
           floatingActionButton: FloatingActionButton(
               child: Icon(Icons.search), onPressed: () => startScanning())),
