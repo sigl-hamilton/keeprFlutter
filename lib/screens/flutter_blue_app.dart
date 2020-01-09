@@ -90,7 +90,7 @@ class FindDevicesScreen extends StatelessWidget {
                                 if (snapshot.data ==
                                     BluetoothDeviceState.connected) {
                                   return RaisedButton(
-                                      child: Text('OPEN'),
+                                      child: Text('Disconnect'),
                                       onPressed: () => () {
                                             dev.log('disconnected');
                                             d.disconnect();

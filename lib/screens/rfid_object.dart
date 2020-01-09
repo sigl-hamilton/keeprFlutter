@@ -6,11 +6,21 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'dart:developer';
 
 import 'package:flutter/scheduler.dart';
+import 'package:keepr/screens/api.dart';
 
 class SensorPage extends StatefulWidget {
-  const SensorPage({Key key, this.device, this.addTodoItem}) : super(key: key);
+  const SensorPage(
+      {Key key,
+      this.device,
+      this.addTodoItem,
+      this.getItemState,
+      this.setItemState})
+      : super(key: key);
   final BluetoothDevice device;
   final Function addTodoItem;
+  final Function getItemState;
+  final Function setItemState;
+
   @override
   _SensorPageState createState() => _SensorPageState();
 }
@@ -22,12 +32,16 @@ class _SensorPageState extends State<SensorPage> {
   Stream<List<int>> stream;
   List<double> traceDust = List();
   Map<String, bool> rfidMap;
+  TextEditingController textController;
+
+
 
   @override
   void initState() {
     super.initState();
     isReady = false;
     rfidMap = Map<String, bool>();
+    textController = TextEditingController();
     connectToDevice();
   }
 
@@ -93,26 +107,48 @@ class _SensorPageState extends State<SensorPage> {
   }
 
   void promptAddItem(String name) async {
-    await Future.delayed(Duration.zero);
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text('Ajouter "${name}" à la liste des objets surveillés ?'),
-              actions: <Widget>[
-                FlatButton(
-                    child: Text('Annuler'),
-                    onPressed: () => Navigator.of(context).pop()),
-                FlatButton(
-                    child: Text('Ajouter'),
-                    onPressed: () {
-                      widget.addTodoItem(name);
-                      Navigator.of(context).pop();
-                    })
-              ]);
-        });
+    if (name.length > 0) {
+      await Future.delayed(Duration.zero);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(
+                    'Ajouter l\'objet avec l\'UID "${name}" à la liste des objets surveillés ?'),
+                content: TextField(
+                  controller: textController,
+                  decoration:
+                      InputDecoration(hintText: "Entrez le nom de l'objet"),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                      child: Text('Annuler'),
+                      onPressed: () => Navigator.of(context).pop()),
+                  FlatButton(
+                      child: Text('Ajouter'),
+                      onPressed: () {
+                        widget.addTodoItem(
+                            textController.text + " (" + name + ")");
+                        apiPost(textController.text, name);
+                        Navigator.of(context).pop();
+                      })
+                ]);
+          });
+    }
   }
 
+  void mySetItemState(String name, bool value) async {
+    await Future.delayed(Duration.zero);
+    widget.setItemState(name, value);
+    return;
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    textController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +163,6 @@ class _SensorPageState extends State<SensorPage> {
             : Container(
                 child: StreamBuilder<List<int>>(
                   stream: stream,
-                  initialData: [0],
                   builder: (BuildContext context,
                       AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError)
@@ -137,13 +172,6 @@ class _SensorPageState extends State<SensorPage> {
                       var currentValue = _dataParser(snapshot.data);
                       traceDust.add(double.tryParse(currentValue) ?? 0);
                       var id = '${currentValue}';
-                      // SchedulerBinding.instance.addPostFrameCallback((_) => widget.addTodoItem('${currentValue}'));
-
-                     /*  Future.delayed(const Duration(milliseconds: 100), () {
-                        widget.addTodoItem('${currentValue}');
-                      }); */
-
-                      
 
                       if (!rfidMap.containsKey(id)) {
                         rfidMap[id] = true;
@@ -152,21 +180,41 @@ class _SensorPageState extends State<SensorPage> {
                         rfidMap[id] = !rfidMap[id];
                       }
 
+                      /* if (widget.getItemState(id) == null) {
+                        mySetItemState(id,true);
+                        promptAddItem(id);
+                      } else {
+                        mySetItemState(id,!widget.getItemState(id));
+                      } */
+
                       log('read from bluetooth ' + id);
                       return Center(
                           child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text('Current value from Sensor',
+                          Text('Le capteur est en marche',
                               style: TextStyle(fontSize: 14)),
-                          rfidMap[id] 
-                          ? Text('RFID UID : ' + id,
-                              style: TextStyle(
-                                  color: Colors.green, fontWeight: FontWeight.bold, fontSize: 24)) 
-                          : Text('RFID UID : ' + id,
-                              style: TextStyle(
-                                 color: Colors.red, fontWeight: FontWeight.bold, fontSize: 24)) 
-
+                            id.isEmpty
+                              ? Text('Aucun objet',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 24))
+                              : rfidMap[id]
+                                  ? Text(
+                                      'L\'objet (${id})\n est actuellement dans le sac',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 24))
+                                  : Text(
+                                      'Attention, l\'objet (${id})\n n\'est plus présent dans le sac',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 24))
                         ],
                       ));
                     } else {

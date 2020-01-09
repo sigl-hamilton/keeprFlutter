@@ -1,9 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:keepr/screens/jsonget.dart';
 import 'package:keepr/screens/nav_bar_color.dart';
 import 'package:keepr/screens/rfid_object.dart';
 import 'package:flutter/scheduler.dart';
-
 
 class DeviceList extends StatefulWidget {
   const DeviceList({Key key, this.device});
@@ -14,14 +16,36 @@ class DeviceList extends StatefulWidget {
 }
 
 class DeviceListState extends State<DeviceList> {
-  List<String> todoItems = [];
-  int testing = 0;
+  Map<String, bool> itemState;
+  List<String> todoItems;
+  int testing;
+  bool loaded;
 
+  @override
+  void initState() {
+    super.initState();
+    todoItems = [];
+    itemState = Map<String, bool>();
+    testing = 0;
+    loaded = false;
+  }
+
+  Future loadData() async {
+    var a = await apiGet();
+   
+    for (var item in a) {
+       log("hello " + item.name);
+     addTodoItem(item.name + " (" + item.code + ")");
+    }
+   // a.map((item) => addTodoItem(item.name + " (" + item.code + ")"));
+  }
 
   addTodoItem(String task) {
     if (task.length > 0) {
-     // SchedulerBinding.instance.addPostFrameCallback((_) => setState(() => todoItems.add(task)));
-    setState(() => todoItems.add(task));
+      log(task);
+      // SchedulerBinding.instance.addPostFrameCallback((_) => setState(() => todoItems.add(task)));
+      setState(() => todoItems.add(task));
+      setState(() => itemState[task] = true);
     }
   }
 
@@ -31,6 +55,22 @@ class DeviceListState extends State<DeviceList> {
 
   _clearTodoItem() {
     setState(() => todoItems.clear());
+    setState(() => itemState.clear());
+    apiDelete();
+  }
+
+  updateTodoItem() {
+    setState(() {});
+  }
+
+  getItemState(String key) {
+    var res = itemState[key];
+    if (res == null) return true;
+    return itemState[key];
+  }
+
+  void setItemState(String key, bool value) {
+    setState(() => itemState[key] = value);
   }
 
   startScanning() {
@@ -41,6 +81,11 @@ class DeviceListState extends State<DeviceList> {
   }
 
   Widget _buildDeviceList() {
+    if (!loaded) {
+      loadData();
+      log("data loaded");
+      setState(() => loaded = true);
+    }
     return todoItems.isEmpty
         ? Center(child: Text('Scannez les objets bluetooth !'))
         : ListView.builder(
@@ -87,20 +132,29 @@ class DeviceListState extends State<DeviceList> {
             appBar: AppBar(
               title: Text('Find Devices'),
               actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  _clearTodoItem();
-                },
-              )
-            ],
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    _clearTodoItem();
+                  },
+                )
+              ],
               flexibleSpace: NavBarColor(),
             ),
+            resizeToAvoidBottomPadding: false,
             body: Column(children: [
-              Expanded(child: _buildDeviceList()),
-              Expanded(child: SensorPage(device: widget.device, addTodoItem: addTodoItem))
+              Container(
+                  height: MediaQuery.of(context).size.height * 0.70,
+                  child: _buildDeviceList()),
+              Expanded(
+                  child: SensorPage(
+                device: widget.device,
+                addTodoItem: addTodoItem,
+                getItemState: getItemState,
+                setItemState: setItemState,
+              ))
             ]),
             floatingActionButton: FloatingActionButton(
-                child: Icon(Icons.search), onPressed: () => startScanning())));
+                child: Icon(Icons.search), onPressed: () => apiDelete())));
   }
 }
